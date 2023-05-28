@@ -49,7 +49,7 @@ def CrossEntropy(target, prediction):
 
 ## 4. training 
 model = ResNet18().to(device)
-optimizer = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
 total_train_step = 0
 total_test_step = 0
@@ -67,7 +67,7 @@ for i in range(args.epoch):
         targets = targets.to(device)
         outputs = model(imgs)
         loss = CrossEntropy(targets, outputs)
-        print(loss)
+        # print(loss)
 
         # optimizer
         optimizer.zero_grad()  
