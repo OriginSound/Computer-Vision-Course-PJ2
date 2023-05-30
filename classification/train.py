@@ -11,8 +11,8 @@ from dataset import BaselineDataset, CutOutDataset, CutMixDataset, MixUpDataset
 
 ## 1. Hyper - Parameters
 parser = argparse.ArgumentParser()
-parser.add_argument("--epoch", type=int, default=10)
-parser.add_argument("--batchsize", type=int, default=100)
+parser.add_argument("--epoch", type=int, default=200)
+parser.add_argument("--batchsize", type=int, default=128)
 parser.add_argument("--gpu", type=int, default=-1)
 parser.add_argument("--mode", type=int, default=0)
 args = parser.parse_args()
@@ -49,11 +49,15 @@ def CrossEntropy(target, prediction):
 
 ## 4. training 
 model = ResNet18().to(device)
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+# optimizer = torch.optim.Adam(model.parameters(), lr=2e-3)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+train_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[60, 120, 160], gamma=0.2) 
+
 
 total_train_step = 0
 total_test_step = 0
-writer = SummaryWriter("./results/logdir")
+best_acc = 0
+writer = SummaryWriter(f"./results/temp_logdir/{args.mode}")
 
 start_time = time.time()
 for i in range(args.epoch):
@@ -67,7 +71,6 @@ for i in range(args.epoch):
         targets = targets.to(device)
         outputs = model(imgs)
         loss = CrossEntropy(targets, outputs)
-        # print(loss)
 
         # optimizer
         optimizer.zero_grad()  
@@ -80,6 +83,9 @@ for i in range(args.epoch):
             print(end_time-start_time)
             print("Steps:{}, Loss:{}".format(total_train_step, loss.item()))
             writer.add_scalar("train_loss", loss.item(), total_train_step)
+
+    train_scheduler.step(i)
+
 
     # testing
     model.eval()
@@ -103,10 +109,11 @@ for i in range(args.epoch):
     writer.add_scalar("test_loss", total_test_loss, total_test_step)
     writer.add_scalar("test_accuracy", total_accuracy/len(test_data), total_test_step)
     total_test_step = total_test_step + 1
+    if total_accuracy > best_acc:
+        best_acc = total_accuracy
+        torch.save(model, f"results/checkpoints/cifar_{args.mode}_{i}.pth")
 
-    torch.save(model, f"results/checkpoints/cifar_{args.mode}_{i}.pth")
     print("Done!")
-
 
 writer.close()
 

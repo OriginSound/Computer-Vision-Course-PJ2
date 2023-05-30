@@ -11,7 +11,7 @@ class Cutmix(object):
     Args:
         length (int): The length (in pixels) of each square patch.
     """
-    def __init__(self, length=16):
+    def __init__(self, length=20):
         self.length = length
 
     def __call__(self, data1: Tuple[Tensor, Tensor], data2: Tuple[Tensor, Tensor]):

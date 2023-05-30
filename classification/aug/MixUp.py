@@ -10,7 +10,7 @@ class Mixup(object):
     Args:
         prob (float): the probability of the first image
     """
-    def __init__(self, prob: float = 0.7):
+    def __init__(self, prob: float = 0.5):
         self.prob = prob
 
     def __call__(self, data1: Tuple[Tensor, Tensor], data2: Tuple[Tensor, Tensor]):

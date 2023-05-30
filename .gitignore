@@ -129,6 +129,6 @@ dmypy.json
 .pyre/
 
 # classification
-.classification/__pycache_/
-.classification/results/
-.classification/cifar_data/
+classification/__pycache_/
+classification/results/
+classification/cifar_data/
