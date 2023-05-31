@@ -111,11 +111,39 @@ checkpoint</a></td>
 
 </tbody></table>
 
+### Training
+```
+python train.py --model ${MODEL} --epoch ${EPOCH} --batchsize ${BATCHSIZE} --gpu ${GPU_ID} --mode ${MODE}
+```
+
+- `MODE=0`: baseline
+- `MODE=1`: cutout
+- `MODE=2`: mixup 
+- `MODE=3`: cutmix 
+
+
+### Test
+```
+python test.py --checkpoint ${CHECKPOINT_FILE} --batchsize ${BATCHSIZE} --gpu ${GPU_ID}
+```
+
 ## Detection 
 
 The config files for faster R-CNN, FCOS, and YOLOv3 are shown in the following table.
 |   Model         | config name  | Download |
 |:---------------:|:-----------:|:---------:|
-| Faster R-CNN  | [Faster R-RNN](https://github.com/OriginSound/Computer-Vision-Course-PJ2/blob/main/detection/configs/pascal_voc/faster_rcnn_r50_fpn_1x_voc0712.py) | [model](https://pan.baidu.com/s/1xSORdAJLN0k3O7GpfLSZKQ)  |
-|FCOS | [FCOS](https://github.com/OriginSound/Computer-Vision-Course-PJ2/blob/main/detection/configs/pascal_voc/fcos_4x4.py) | [model](https://pan.baidu.com/s/1xSORdAJLN0k3O7GpfLSZKQ)  |
-|YOLOv3 | [YOLOv3](https://github.com/OriginSound/Computer-Vision-Course-PJ2/blob/main/detection/configs/pascal_voc/yolov3_d53_mstrain-608_100e_voc0712.py) | [model](https://pan.baidu.com/s/1xSORdAJLN0k3O7GpfLSZKQ)  |
+| Faster R-CNN  | [Faster R-RNN](https://github.com/OriginSound/Computer-Vision-Course-PJ2/blob/main/detection/configs/pascal_voc/faster_rcnn_r50_fpn_1x_voc0712.py) | [checkpoint](https://pan.baidu.com/s/1CyFIBYO1TQSDm6anTxy-sA)  |
+|FCOS | [FCOS](https://github.com/OriginSound/Computer-Vision-Course-PJ2/blob/main/detection/configs/pascal_voc/fcos_4x4.py) | [checkpoint](https://pan.baidu.com/s/15CPnc8xFz0Ybn1ovQQ5Ztg)  |
+|YOLOv3 | [YOLOv3](https://github.com/OriginSound/Computer-Vision-Course-PJ2/blob/main/detection/configs/pascal_voc/yolov3_d53_mstrain-608_100e_voc0712.py) | [checkpoint](https://pan.baidu.com/s/1xJV3-rZ7-dTuvbTsCHt-uw)  |
+
+### Training
+please first turn to the mmdetection and then run 
+```
+bash tools/dist_train.sh ${CONFIG_FILE} ${GPU_NUM} 
+```
+
+### Test
+To test our trained model, please run
+```
+bash tools/dist_test.sh ${CONFIG_FILE} ${CHECKPOINT_FILE} ${GPU_NUM} --eval mAP
+```
