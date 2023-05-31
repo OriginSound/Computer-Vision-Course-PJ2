@@ -135,3 +135,4 @@ classification/cifar_data/
 detection/ckpts/
 detection/mmdet.egg-info/
 detection/vis/
+detection/resources/
