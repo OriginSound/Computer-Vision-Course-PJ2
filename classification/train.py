@@ -5,17 +5,20 @@ import torch
 from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
 
-from models import * 
+# from models import * 
+from utils import get_network, make_folders
 from dataset import BaselineDataset, CutOutDataset, CutMixDataset, MixUpDataset 
 
 
 ## 1. Hyper - Parameters
 parser = argparse.ArgumentParser()
+parser.add_argument("--model", type=str, default="resnet18")
 parser.add_argument("--epoch", type=int, default=200)
 parser.add_argument("--batchsize", type=int, default=128)
 parser.add_argument("--gpu", type=int, default=-1)
 parser.add_argument("--mode", type=int, default=0)
 args = parser.parse_args()
+
 
 if args.gpu >= 0 and type(args.gpu) == int:
     device = torch.device(f"cuda:{args.gpu}")
@@ -48,16 +51,20 @@ def CrossEntropy(target, prediction):
 
 
 ## 4. training 
-model = ResNet18().to(device)
-# optimizer = torch.optim.Adam(model.parameters(), lr=2e-3)
+model = get_network(args.model)
+model = model.to(device)
+
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
-train_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[60, 120, 160], gamma=0.2) 
+train_scheduler = torch.optim.lr_scheduler.MultiStepLR(
+    optimizer, milestones=[60, 120, 160], gamma=0.2
+) 
 
 
 total_train_step = 0
 total_test_step = 0
 best_acc = 0
-writer = SummaryWriter(f"./results/temp_logdir/{args.mode}")
+make_folders(args)
+writer = SummaryWriter(f"./results/{args.model}/logdir/{args.mode}")
 
 start_time = time.time()
 for i in range(args.epoch):
@@ -111,11 +118,15 @@ for i in range(args.epoch):
     total_test_step = total_test_step + 1
     if total_accuracy > best_acc:
         best_acc = total_accuracy
-        torch.save(model, f"results/checkpoints/cifar_{args.mode}_{i}.pth")
-
+        # torch.save(model, f"results/checkpoints/cifar_{args.mode}_{i}.pth")
     print("Done!")
 
+# 5 close the tensorboard and save the model and log
 writer.close()
+torch.save(model, f"./results/{args.model}/checkpoints/cifar_{args.mode}_{i}.pth")
+with open(f"./results/{args.model}/logs/{args.mode}.log", "w+") as f:
+    f.write(f"Epoch:{args.epoch}, Name:{args.model}, Accuracy:{total_accuracy/len(test_data)}")
+
 
 
 
